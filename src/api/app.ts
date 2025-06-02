@@ -11,8 +11,8 @@ import { SystemService } from '../application/services/SystemService';
 import { DynamoUserRepository } from "../infrastructure/repositories/implementation/DynamoUserRepository";
 import { SystemRepository } from "../infrastructure/repositories/implementation/SystemRepository";
 
-import { createUserRoutes } from "../api/routes/userRoutes";
-import { createSystemRoutes } from "../api/routes/systemRoutes";
+import { createUserRoutes } from "./handlers/userRoutes";
+import { createSystemRoutes } from "./handlers/systemRoutes";
 
 import { DatabaseConfig } from "../infrastructure/config/postgresql";
 
