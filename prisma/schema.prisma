@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model System {
+  id                   String       @id @default(uuid())
+  storeCode           String
+  name                String
+  description         String?
+  codeFailure         String?
+  codeStoreLocation   String?
+  inChargeByDefault   String
+  sapTechnicalCode    String
+  companyCode         String
+  costCenter          String
+  priority            String
+  code                String       @default("code")
+  createdAt           DateTime     @default(now()) @db.Timestamp(6)
+  createdOn           String
+  modifiedAt          DateTime     @updatedAt @db.Timestamp(6)
+  modifiedOn          String
+  
+  // Relations
+  subsystems          Subsystem[]
+  equipments          Equipment[]
+
+  @@map("System")
+}
+
+model Subsystem {
+  id                   String       @id @default(uuid())
+  name                String
+  description         String
+  codeFailure         String?
+  codeStoreLocation   String?
+  inChargeByDefault   String
+  sapTechnicalCode    String
+  companyCode         String
+  costCenter          String
+  priority            String
+  code                String       @default("code")
+  systemId            String
+  createdAt           DateTime     @default(now()) @db.Timestamp(6)
+  createdOn           String
+  modifiedAt          DateTime     @updatedAt @db.Timestamp(6)
+  modifiedOn          String
+  
+  // Relations
+  system              System       @relation(fields: [systemId], references: [id], onDelete: Cascade)
+  equipments          Equipment[]
+
+  @@index([systemId], map: "IX_Subsystem_systemId")
+  @@map("Subsystem")
+}
+
+model Equipment {
+  id                          String                   @id @default(uuid())
+  name                        String
+  description                 String?
+  codeFailure                 String?
+  codeStoreLocation           String?
+  inChargeByDefault           String
+  sapTechnicalCode            String
+  companyCode                 String
+  costCenter                  String
+  priority                    String
+  code                        String                   @default("code")
+  typeSource                  String?
+  category                    String?
+  inventoryNumber             String?
+  brand                       String?
+  model                       String?
+  serialNumber                String?
+  planingGroup                String?
+  catalogProfile              String?
+  assemblyType                String?
+  emplacementCode             String?
+  planningGroupDescription    String?
+  systemId                    String?
+  subsystemId                 String?
+  createdAt                   DateTime                 @default(now()) @db.Timestamp(6)
+  createdOn                   String
+  modifiedAt                  DateTime                 @updatedAt @db.Timestamp(6)
+  modifiedOn                  String
+  
+  // Relations
+  system                      System?                  @relation(fields: [systemId], references: [id], onDelete: SetNull)
+  subsystem                   Subsystem?               @relation(fields: [subsystemId], references: [id], onDelete: SetNull)
+  equipmentReplacements       EquipmentReplacement[]
+
+  @@index([subsystemId], map: "IX_Equipment_subsystemId")
+  @@index([systemId], map: "IX_Equipment_systemId")
+  @@map("Equipment")
+}
+
+model Replacement {
+  id                     String                   @id @default(uuid())
+  name                   String
+  description            String
+  sapCode                String
+  sapMaterialCode        String
+  code                   String
+  createdAt              DateTime                 @default(now()) @db.Timestamp(6)
+  createdOn              String
+  modifiedAt             DateTime                 @updatedAt @db.Timestamp(6)
+  modifiedOn             String
+  
+  // Relations
+  equipmentReplacements  EquipmentReplacement[]
+
+  @@map("Replacement")
+}
+
+model EquipmentReplacement {
+  equipmentId    String
+  replacementId  String
+  createdAt      DateTime  @default(now()) @db.Timestamp(6)
+  createdOn      String
+  modifiedAt     DateTime  @updatedAt @db.Timestamp(6)
+  modifiedOn     String
+  
+  // Relations
+  equipment      Equipment    @relation(fields: [equipmentId], references: [id])
+  replacement    Replacement  @relation(fields: [replacementId], references: [id])
+
+  @@id([equipmentId, replacementId])
+  @@index([replacementId], map: "IX_EquipmentReplacement_replacementId")
+  @@map("EquipmentReplacement")
+}
+
+model Failure {
+  id             String    @id @default(uuid())
+  type           String
+  name           String
+  description    String
+  sapCode        String
+  sapDescription String
+  code           String
+  createdAt      DateTime  @default(now()) @db.Timestamp(6)
+  createdOn      String
+  modifiedAt     DateTime  @updatedAt @db.Timestamp(6)
+  modifiedOn     String
+
+  @@map("Failure")
+}
+
+model StoreLocation {
+  id             String    @id @default(uuid())
+  type           String
+  name           String
+  description    String
+  sapCode        String
+  sapDescription String
+  code           String
+  createdAt      DateTime  @default(now()) @db.Timestamp(6)
+  createdOn      String
+  modifiedAt     DateTime  @updatedAt @db.Timestamp(6)
+  modifiedOn     String
+
+  @@map("StoreLocation")
+}
